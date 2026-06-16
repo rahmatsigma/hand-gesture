@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from src.shape_detector import ShapeDetector
 
 class VirtualRenderer:
     def __init__(self):
@@ -8,6 +9,7 @@ class VirtualRenderer:
         self.offset = np.array([0.5, 0.5]) # Posisi pusat gambar (tengah layar)
         self.scale = 1.0
         self.angle = 0.0
+        self.detector = ShapeDetector()
 
     def add_point(self, point):
         """Menyimpan poin dalam model-space (relatif terhadap offset, scale, rotation)"""
@@ -22,7 +24,9 @@ class VirtualRenderer:
 
     def finish_stroke(self):
         if self.current_stroke:
-            self.all_strokes.append(self.current_stroke)
+            # Deteksi dan sempurnakan bentuk jika memungkinkan
+            perfected_stroke = self.detector.detect_and_perfect(self.current_stroke)
+            self.all_strokes.append(perfected_stroke)
             self.current_stroke = []
 
     def draw(self, frame):
