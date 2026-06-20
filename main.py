@@ -44,7 +44,7 @@ def main():
 
         # ─── LOGIKA 2 TANGAN (MANIPULATION) ─────────────
         elif len(hands) == 2:
-            cv2.putText(frame, "STATUS: MANIPULATING", (20, 50), 1, 1.5, (255, 255, 0), 2)
+            cv2.putText(frame, "STATUS: MANIPULATING (3D)", (20, 50), 1, 1.5, (255, 255, 0), 2)
             renderer.finish_stroke()
             
             p1, p2 = hands[0]['center'], hands[1]['center']
@@ -57,13 +57,25 @@ def main():
             if prev_dist > 0:
                 renderer.scale += (dist - prev_dist) * 2
                 renderer.scale = max(0.1, renderer.scale)
-            prev_dist = dist
-
-            # 3. Putar (Rotation)
-            angle = np.arctan2(p2[1] - p1[1], p2[0] - p1[0])
+            
+            # 3. Putar 3D (Rotation)
+            # Rotasi Y (yaw) dari sudut horizontal antara tangan
+            # Rotasi X (pitch) dari perbedaan tinggi tangan relatif terhadap jarak
             if prev_dist > 0:
-                renderer.angle += (angle - prev_angle)
-            prev_angle = angle
+                # Rotasi Z (seperti sebelumnya)
+                angle_z = np.arctan2(p2[1] - p1[1], p2[0] - p1[0])
+                renderer.angles[2] += (angle_z - prev_angle)
+                
+                # Rotasi Y (gerakan maju mundur tangan relatif satu sama lain)
+                angle_y = (p2[2] - p1[2]) * 5
+                renderer.angles[1] += angle_y * 0.1
+                
+                # Rotasi X (gerakan naik turun tangan relatif satu sama lain)
+                angle_x = (p2[1] - p1[1]) * 2
+                renderer.angles[0] += angle_x * 0.01
+
+            prev_dist = dist
+            prev_angle = np.arctan2(p2[1] - p1[1], p2[0] - p1[0])
             
             # Visualisasi kursor di telapak tangan
             for h_info in hands:
@@ -87,3 +99,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

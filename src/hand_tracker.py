@@ -20,11 +20,12 @@ class HandTracker:
         if results.multi_hand_landmarks:
             for landmarks in results.multi_hand_landmarks:
                 # Landmark 8 = Ujung Telunjuk
-                index_tip = np.array([landmarks.landmark[8].x, landmarks.landmark[8].y])
+                index_tip = np.array([landmarks.landmark[8].x, landmarks.landmark[8].y, landmarks.landmark[8].z])
                 # Landmark 9 = Tengah Telapak
-                center = np.array([landmarks.landmark[9].x, landmarks.landmark[9].y])
+                center = np.array([landmarks.landmark[9].x, landmarks.landmark[9].y, landmarks.landmark[9].z])
 
                 # Logika: Jari telunjuk naik (y8 < y6), jari tengah turun (y12 > y10)
+                # Gunakan y untuk deteksi naik/turun
                 index_up = landmarks.landmark[8].y < landmarks.landmark[6].y
                 middle_down = landmarks.landmark[12].y > landmarks.landmark[10].y
                 
